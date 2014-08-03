@@ -9,6 +9,8 @@ import javax.ws.rs.core.GenericType;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import ch.romix.ivk.resultarchiver.model.Group;
+
 public class Main {
 
   private static final String BASE_URL = "http://korbball.turnverband.ch/ws/";

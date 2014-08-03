@@ -1,4 +1,4 @@
-package ch.romix.ivk.resultarchiver;
+package ch.romix.ivk.resultarchiver.model;
 
 import java.io.Serializable;
 
