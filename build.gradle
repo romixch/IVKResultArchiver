@@ -22,5 +22,8 @@ repositories {
 dependencies {
     compile group: 'org.jboss.resteasy', name: 'resteasy-client', version: '3.0.8.Final'
     compile group: 'org.jboss.resteasy', name: 'resteasy-jettison-provider', version: '2.3.6.Final'
+    compile(group: 'org.eclipse.birt.runtime', name: 'org.eclipse.birt.runtime', version: '4.4.0') {
+    	exclude(group: 'org.milyn', module: 'flute')
+    }
     testCompile group: 'junit', name: 'junit', version: '4.+'
 }
