@@ -46,10 +46,10 @@ public class TestTableParser {
     List<Round> rounds = table.getRounds();
     assertNotNull(rounds);
     assertEquals(2, rounds.size());
-    rounds.forEach(r -> {
+    for (Round r : rounds) {
       assertNotNull(r.getName());
       assertTrue(r.getId() > 0);
-    });
+    }
   }
 
   @Test
@@ -57,10 +57,10 @@ public class TestTableParser {
     List<Team> teams = table.getTeams();
     assertNotNull(teams);
     assertTrue(0 < teams.size());
-    teams.forEach(t -> {
+    for (Team t : teams) {
       assertTrue(t.getId() > 0);
       assertNotNull(t.getName());
-    });
+    }
   }
 
   @Test
@@ -69,36 +69,40 @@ public class TestTableParser {
     assertNotNull(gamess);
     assertEquals("Something is wrong with the amount of rounds in the table and in the games.",
         table.getRounds().size(), gamess.size());
-    gamess.forEach(g -> {
-      assertTrue(table.getRounds().stream().filter(r -> r.getId() == g.getRoundId()).count() == 1);
-    });
+    for (Games g : gamess) {
+      int count = 0;
+      for (Round r : table.getRounds()) {
+        if (g.getRoundId() == r.getId()) {
+          count++;
+        }
+      }
+      assertEquals(1, count);
+    }
   }
 
   @Test
   public void assertGames_Rounds_TeamOne() {
-    table.getGames().forEach(
-        g -> {
-          List<TeamOne> teamOnes = g.getTeamOnes();
-          assertEquals("There must be the same amount of TeamOnes as teams.", table.getTeams()
-              .size(), teamOnes.size());
-          teamOnes.forEach(t -> {
-            assertTrue(t.getTeamOneId() > 0);
-          });
-        });
+    for (Games g : table.getGames()) {
+      List<TeamOne> teamOnes = g.getTeamOnes();
+      assertEquals("There must be the same amount of TeamOnes as teams.", table.getTeams().size(),
+          teamOnes.size());
+      for (TeamOne t : teamOnes) {
+        assertTrue(t.getTeamOneId() > 0);
+      }
+    }
   }
-
 
   @Test
   public void assertGames_Rounds_TeamOne_TeamTwo() {
-    table.getGames().forEach(g -> {
-      g.getTeamOnes().forEach(ones -> {
+    for (Games g : table.getGames()) {
+      for (TeamOne ones : g.getTeamOnes()) {
         List<TeamTwo> teamTwos = ones.getTeamTwos();
         assertEquals(g.getTeamOnes().size(), teamTwos.size() + 1);
-        teamTwos.forEach(two -> {
+        for (TeamTwo two : teamTwos) {
           assertTrue(two.getTeamTwoId() > 0);
           assertNotNull(two.getResult());
-        });
-      });
-    });
+        }
+      }
+    }
   }
 }

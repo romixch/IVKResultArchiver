@@ -2,6 +2,8 @@ apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'com.github.johnrengelman.shadow'
 
+sourceCompatibility = 1.7
+
 buildscript {
   repositories { jcenter() }
   dependencies {
@@ -22,8 +24,12 @@ repositories {
 dependencies {
     compile group: 'org.jboss.resteasy', name: 'resteasy-client', version: '3.0.8.Final'
     compile group: 'org.jboss.resteasy', name: 'resteasy-jettison-provider', version: '2.3.6.Final'
-    compile(group: 'org.eclipse.birt.runtime', name: 'org.eclipse.birt.runtime', version: '4.4.0') {
-    	exclude(group: 'org.milyn', module: 'flute')
+    compile (group: 'net.sf.jasperreports', name: 'jasperreports', version: '5.6.0') {
+    	exclude group: 'org.olap4j', module: 'olap4j'
+    	exclude group: 'com.lowagie', module: 'itext'
     }
+    runtime group: 'com.lowagie', name: 'itext', version: '2.1.7'
+    runtime group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.0.1'
+
     testCompile group: 'junit', name: 'junit', version: '4.+'
 }
