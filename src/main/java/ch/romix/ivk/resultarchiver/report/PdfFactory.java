@@ -47,7 +47,9 @@ public class PdfFactory {
       Document document = new Document(PageSize.A4.rotate());
       File outputDir = new File(System.getProperties().getProperty("user.dir"), "ResultArchive");
       Files.createDirectories(outputDir.toPath());
-      File pdfFile = new File(outputDir, group.getName() + ".pdf");
+      String fileName = group.getName();
+      fileName = fileName.replace('/', '_');
+      File pdfFile = new File(outputDir, fileName + ".pdf");
       pdfFile.delete();
       PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
       document.open();
