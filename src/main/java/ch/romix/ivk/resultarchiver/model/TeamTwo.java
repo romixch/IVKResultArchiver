@@ -16,6 +16,6 @@ public class TeamTwo {
   }
 
   public String getResult() {
-    return result;
+    return result.replace("&nbsp;", "");
   }
 }

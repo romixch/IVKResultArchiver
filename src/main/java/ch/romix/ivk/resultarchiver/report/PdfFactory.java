@@ -5,9 +5,13 @@ import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.util.Date;
 
+import ch.romix.ivk.resultarchiver.model.Games;
 import ch.romix.ivk.resultarchiver.model.Group;
 import ch.romix.ivk.resultarchiver.model.Table;
+import ch.romix.ivk.resultarchiver.model.TeamOne;
+import ch.romix.ivk.resultarchiver.model.TeamTwo;
 
+import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
@@ -67,43 +71,78 @@ public class PdfFactory {
 
   private void addTitle(Document document) throws DocumentException {
     Paragraph preface = new Paragraph();
+    preface.add(new Paragraph("Resultate der Innerschweizer Korbball Meisterschaft", catFont));
     addEmptyLine(preface, 1);
-    preface.add(new Paragraph("Innerschweizer Korbball Meisterschaft", catFont));
-    addEmptyLine(preface, 1);
-    preface.add(new Paragraph("Resultate der Gruppe " + group.getName(), catFont));
-    addEmptyLine(preface, 3);
     document.add(preface);
   }
 
   private void addTable(Document document) throws DocumentException {
-    // PdfPTable table = new PdfPTable(this.table.getTeams().size() + 1);
-    PdfPTable table = new PdfPTable(this.table.getTeams().size() + 1);
-    int[] widths = new int[table.getNumberOfColumns()];
-    widths[0] = 3;
-    for (int i = 1; i < widths.length; i++) {
+    PdfPTable pdfTable = new PdfPTable(table.getTeams().size() + 2);
+    int[] widths = new int[pdfTable.getNumberOfColumns()];
+    widths[0] = 2;
+    widths[1] = 2;
+    for (int i = 2; i < widths.length; i++) {
       widths[i] = 1;
     }
-    table.setWidths(widths);
-    table.setWidthPercentage(100);
+    pdfTable.setWidths(widths);
+    pdfTable.setWidthPercentage(100);
 
-    writeFirstLine(table);
+    writeHeaderRow(pdfTable);
 
+    writeResults(pdfTable);
 
-    document.add(table);
+    document.add(pdfTable);
 
   }
 
-  private void writeFirstLine(PdfPTable table) {
+  private void writeResults(PdfPTable pdfTable) {
+    table.getTeams().forEach(
+        teamOne -> {
+          PdfPCell teamCell = new PdfPCell(new Phrase(teamOne.getName()));
+          teamCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+          teamCell.setRowspan(table.getRounds().size());
+          pdfTable.addCell(teamCell);
+          table.getRounds().forEach(
+              round -> {
+                pdfTable.addCell(round.getName());
+                table.getTeams().forEach(
+                    teamTwo -> {
+                      if (teamOne.getId() == teamTwo.getId()) {
+                        PdfPCell cell = new PdfPCell(new Phrase(""));
+                        cell.setBackgroundColor(BaseColor.DARK_GRAY);
+                        pdfTable.addCell(cell);
+                      } else {
+                        Games games =
+                            table.getGames().stream().filter(g -> g.getRoundId() == round.getId())
+                                .findAny().get();
+                        TeamOne one =
+                            games.getTeamOnes().stream()
+                                .filter(o -> o.getTeamOneId() == teamOne.getId()).findAny().get();
+                        TeamTwo two =
+                            one.getTeamTwos().stream()
+                                .filter(t -> t.getTeamTwoId() == teamTwo.getId()).findAny().get();
+                        String result = two.getResult();
+                        PdfPCell cell = new PdfPCell(new Phrase(result));
+                        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+                        pdfTable.addCell(cell);
+                      }
+                    });
+              });
+        });
+  }
+
+  private void writeHeaderRow(PdfPTable pdfTable) {
     PdfPCell groupCell = new PdfPCell(new Phrase(group.getName(), smallBold));
     groupCell.setHorizontalAlignment(Element.ALIGN_CENTER);
     groupCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-    table.addCell(groupCell);
+    groupCell.setColspan(2);
+    pdfTable.addCell(groupCell);
 
-    this.table.getTeams().forEach(t -> {
+    table.getTeams().forEach(t -> {
       PdfPCell cell = new PdfPCell(new Phrase(t.getName()));
       cell.setRotation(90);
       cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-      table.addCell(cell);
+      pdfTable.addCell(cell);
     });
   }
 
