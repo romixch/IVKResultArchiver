@@ -14,9 +14,10 @@ public class Main {
   public static void main(String[] args) {
     Client client = ClientBuilder.newClient();
     List<Group> groups = new GroupParser(client).getGroups();
-    Group group = groups.get(0);
-    Table table = new TableParser(client).getTable(group.getID());
-    print(group, table);
+    groups.forEach(group -> {
+      Table table = new TableParser(client).getTable(group.getID());
+      print(group, table);
+    });
   }
 
   private static void print(Group group, Table table) {
