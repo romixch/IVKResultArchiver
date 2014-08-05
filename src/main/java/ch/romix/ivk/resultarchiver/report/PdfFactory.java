@@ -12,6 +12,7 @@ import java.util.Map;
 
 import ch.romix.ivk.resultarchiver.model.Games;
 import ch.romix.ivk.resultarchiver.model.Group;
+import ch.romix.ivk.resultarchiver.model.Points;
 import ch.romix.ivk.resultarchiver.model.Rate;
 import ch.romix.ivk.resultarchiver.model.Table;
 import ch.romix.ivk.resultarchiver.model.TeamOne;
@@ -41,6 +42,7 @@ public class PdfFactory {
   private List<Rate> rates;
   private PdfPTable pdfTable;
   private Document document;
+  private List<Points> points;
 
   public void setTable(Table table) {
     this.table = table;
@@ -52,6 +54,11 @@ public class PdfFactory {
 
   public void setRates(List<Rate> rates) {
     this.rates = rates;
+  }
+
+  public void setPoints(List<Points> points) {
+    this.points = points;
+
   }
 
   public void print() {
@@ -110,6 +117,8 @@ public class PdfFactory {
     writeResults();
 
     writeRates();
+
+    writePoints();
 
     document.add(pdfTable);
   }
@@ -196,6 +205,17 @@ public class PdfFactory {
     table.getTeams().forEach(team -> {
       Rate rate = teamIdToRateMap.get(team.getId());
       pdfTable.addCell(createCenteredCell(String.valueOf(rate.getRate())));
+    });
+  }
+
+  private void writePoints() {
+    Map<String, Integer> teamIdToPointsMap = new HashMap<>();
+    points.stream().forEach(point -> teamIdToPointsMap.put(point.getTeamId(), point.getPoints()));
+
+    writeSummaryTitle("Punkte");
+    table.getTeams().forEach(team -> {
+      Integer pts = teamIdToPointsMap.get(team.getId());
+      pdfTable.addCell(createCenteredCell(String.valueOf(pts)));
     });
   }
 

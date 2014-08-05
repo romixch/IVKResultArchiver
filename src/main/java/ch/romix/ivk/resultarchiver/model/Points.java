@@ -1,27 +1,21 @@
 package ch.romix.ivk.resultarchiver.model;
 
-import java.util.List;
-
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ComposedModel {
-  private Table table;
-  private List<Rate> rates;
-  private List<Points> points;
+public class Points {
 
-  public Table getTable() {
-    return table;
+  private String teamId;
+  private int points;
+
+  public String getTeamId() {
+    return teamId;
   }
 
-  public List<Rate> getRates() {
-    return rates;
-  }
-
-  public List<Points> getPoints() {
+  public int getPoints() {
     return points;
   }
 }

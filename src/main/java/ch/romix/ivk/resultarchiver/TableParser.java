@@ -8,6 +8,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import ch.romix.ivk.resultarchiver.model.ComposedModel;
+import ch.romix.ivk.resultarchiver.model.Points;
 import ch.romix.ivk.resultarchiver.model.Rate;
 import ch.romix.ivk.resultarchiver.model.Table;
 
@@ -36,5 +37,9 @@ public class TableParser {
 
   public List<Rate> getRates() {
     return model.getRates();
+  }
+
+  public List<Points> getPoints() {
+    return model.getPoints();
   }
 }
