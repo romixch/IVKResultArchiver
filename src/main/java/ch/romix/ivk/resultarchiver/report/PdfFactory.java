@@ -198,6 +198,12 @@ public class PdfFactory {
     return new PdfPCell(new Phrase(text, tableFont));
   }
 
+  private PdfPCell createRankingTableCell(Integer rank) {
+    PdfPCell cell = new PdfPCell(new Phrase(String.valueOf(rank), smallBold));
+    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+    return cell;
+  }
+
   private void writeRates() {
     Map<String, Rate> teamIdToRateMap = new HashMap<>();
     rates.stream().forEach(rate -> teamIdToRateMap.put(rate.getTeamId(), rate));
@@ -235,7 +241,7 @@ public class PdfFactory {
     writeSummaryTitle("Rang");
     table.getTeams().forEach(team -> {
       Integer rank = teamIdToRankingMap.get(team.getId());
-      pdfTable.addCell(createCenteredCell(String.valueOf(rank)));
+      pdfTable.addCell(createRankingTableCell(rank));
     });
   }
 
