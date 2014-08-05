@@ -39,6 +39,8 @@ public class PdfFactory {
   private Group group;
   private Table table;
   private List<Rate> rates;
+  private PdfPTable pdfTable;
+  private Document document;
 
   public void setTable(Table table) {
     this.table = table;
@@ -54,7 +56,7 @@ public class PdfFactory {
 
   public void print() {
     try {
-      Document document = new Document(PageSize.A4.rotate());
+      document = new Document(PageSize.A4.rotate());
       File outputDir = new File(System.getProperties().getProperty("user.dir"), "ResultArchive");
       Files.createDirectories(outputDir.toPath());
       String fileName = group.getName();
@@ -63,21 +65,21 @@ public class PdfFactory {
       pdfFile.delete();
       PdfWriter.getInstance(document, new FileOutputStream(pdfFile));
       document.open();
-      addMetaData(document);
-      addTitle(document);
+      addMetaData();
+      addTitle();
       if (table.hasData()) {
-        addTable(document);
+        addTable();
       } else {
-        addNoDataInformation(document);
+        addNoDataInformation();
       }
-      addFooter(document);
+      addFooter();
       document.close();
     } catch (Exception e) {
       e.printStackTrace();
     }
   }
 
-  private void addMetaData(Document document) {
+  private void addMetaData() {
     document.addTitle("Resultat der Innerschweizer Korbball Meitserschaft");
     document.addSubject(group.getName());
     document.addKeywords("IVK, Korbball " + group.getName());
@@ -85,15 +87,15 @@ public class PdfFactory {
     document.addCreator("Roman Schaller");
   }
 
-  private void addTitle(Document document) throws DocumentException {
+  private void addTitle() throws DocumentException {
     Paragraph preface = new Paragraph();
     preface.add(new Paragraph("Resultate der Innerschweizer Korbball Meisterschaft", titleFont));
     addEmptyLine(preface, 1);
     document.add(preface);
   }
 
-  private void addTable(Document document) throws DocumentException {
-    PdfPTable pdfTable = new PdfPTable(table.getTeams().size() + 2);
+  private void addTable() throws DocumentException {
+    pdfTable = new PdfPTable(table.getTeams().size() + 2);
     int[] widths = new int[pdfTable.getNumberOfColumns()];
     widths[0] = 2;
     widths[1] = 2;
@@ -103,23 +105,23 @@ public class PdfFactory {
     pdfTable.setWidths(widths);
     pdfTable.setWidthPercentage(100);
 
-    writeHeaderRow(pdfTable);
+    writeHeaderRow();
 
-    writeResults(pdfTable);
+    writeResults();
 
-    writeRates(pdfTable);
+    writeRates();
 
     document.add(pdfTable);
   }
 
-  private void addNoDataInformation(Document document) throws DocumentException {
+  private void addNoDataInformation() throws DocumentException {
     Paragraph noDataParagraph =
         new Paragraph("Momentan leider keine Daten für diese Gruppe verfügbar.", smallBold);
     addEmptyLine(noDataParagraph, 1);
     document.add(noDataParagraph);
   }
 
-  private void writeHeaderRow(PdfPTable pdfTable) {
+  private void writeHeaderRow() {
     PdfPCell groupCell = new PdfPCell(new Phrase(group.getName(), titleFont));
     groupCell.setHorizontalAlignment(Element.ALIGN_CENTER);
     groupCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -134,7 +136,7 @@ public class PdfFactory {
     });
   }
 
-  private void writeResults(PdfPTable pdfTable) {
+  private void writeResults() {
     table.getTeams().forEach(
         teamOne -> {
           PdfPCell teamCell = createTableCell(teamOne.getName());
@@ -180,24 +182,24 @@ public class PdfFactory {
     return new PdfPCell(new Phrase(text, tableFont));
   }
 
-  private void writeRates(PdfPTable pdfTable) {
+  private void writeRates() {
     Map<String, Rate> teamIdToRateMap = new HashMap<>();
     rates.stream().forEach(rate -> teamIdToRateMap.put(rate.getTeamId(), rate));
 
-    writeSummaryTitle(pdfTable, "Körbe");
+    writeSummaryTitle("Körbe");
     table.getTeams().forEach(team -> {
       Rate rate = teamIdToRateMap.get(team.getId());
       pdfTable.addCell(createCenteredCell(rate.getBothScores()));
     });
 
-    writeSummaryTitle(pdfTable, "Korbverhältnis");
+    writeSummaryTitle("Korbverhältnis");
     table.getTeams().forEach(team -> {
       Rate rate = teamIdToRateMap.get(team.getId());
       pdfTable.addCell(createCenteredCell(String.valueOf(rate.getRate())));
     });
   }
 
-  private void writeSummaryTitle(PdfPTable pdfTable, String summaryTitle) {
+  private void writeSummaryTitle(String summaryTitle) {
     PdfPCell ratesTitle = createTableCell(summaryTitle);
     ratesTitle.setColspan(2);
     pdfTable.addCell(ratesTitle);
@@ -210,7 +212,7 @@ public class PdfFactory {
     }
   }
 
-  private void addFooter(Document document) throws DocumentException {
+  private void addFooter() throws DocumentException {
     Paragraph footer = new Paragraph();
     addEmptyLine(footer, 1);
     DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
