@@ -4,9 +4,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import ch.romix.ivk.resultarchiver.model.Games;
 import ch.romix.ivk.resultarchiver.model.Group;
+import ch.romix.ivk.resultarchiver.model.Rate;
 import ch.romix.ivk.resultarchiver.model.Table;
 import ch.romix.ivk.resultarchiver.model.TeamOne;
 import ch.romix.ivk.resultarchiver.model.TeamTwo;
@@ -31,6 +35,7 @@ public class PdfFactory {
 
   private Group group;
   private Table table;
+  private List<Rate> rates;
 
   public void setTable(Table table) {
     this.table = table;
@@ -38,6 +43,10 @@ public class PdfFactory {
 
   public void setGroup(Group group) {
     this.group = group;
+  }
+
+  public void setRates(List<Rate> rates) {
+    this.rates = rates;
   }
 
   public void print() {
@@ -53,7 +62,11 @@ public class PdfFactory {
       document.open();
       addMetaData(document);
       addTitle(document);
-      addTable(document);
+      if (table.hasData()) {
+        addTable(document);
+      } else {
+        addNoDataInformation(document);
+      }
       addFooter(document);
       document.close();
     } catch (Exception e) {
@@ -91,8 +104,31 @@ public class PdfFactory {
 
     writeResults(pdfTable);
 
-    document.add(pdfTable);
+    writeRates(pdfTable);
 
+    document.add(pdfTable);
+  }
+
+  private void addNoDataInformation(Document document) throws DocumentException {
+    Paragraph noDataParagraph =
+        new Paragraph("Momentan leider keine Daten für diese Gruppe verfügbar.", smallBold);
+    addEmptyLine(noDataParagraph, 1);
+    document.add(noDataParagraph);
+  }
+
+  private void writeHeaderRow(PdfPTable pdfTable) {
+    PdfPCell groupCell = new PdfPCell(new Phrase(group.getName(), smallBold));
+    groupCell.setHorizontalAlignment(Element.ALIGN_CENTER);
+    groupCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+    groupCell.setColspan(2);
+    pdfTable.addCell(groupCell);
+
+    table.getTeams().forEach(t -> {
+      PdfPCell cell = new PdfPCell(new Phrase(t.getName()));
+      cell.setRotation(90);
+      cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+      pdfTable.addCell(cell);
+    });
   }
 
   private void writeResults(PdfPTable pdfTable) {
@@ -124,29 +160,42 @@ public class PdfFactory {
                                 .filter(t -> t.getTeamTwoId().equals(teamTwo.getId())).findAny()
                                 .get();
                         String result = two.getResult();
-                        PdfPCell cell = new PdfPCell(new Phrase(result));
-                        cell.setHorizontalAlignment(Element.ALIGN_CENTER);
-                        pdfTable.addCell(cell);
+                        pdfTable.addCell(createCenteredCell(result));
                       }
                     });
               });
         });
   }
 
-  private void writeHeaderRow(PdfPTable pdfTable) {
-    PdfPCell groupCell = new PdfPCell(new Phrase(group.getName(), smallBold));
-    groupCell.setHorizontalAlignment(Element.ALIGN_CENTER);
-    groupCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-    groupCell.setColspan(2);
-    pdfTable.addCell(groupCell);
+  private PdfPCell createCenteredCell(String result) {
+    PdfPCell cell = new PdfPCell(new Phrase(result));
+    cell.setHorizontalAlignment(Element.ALIGN_CENTER);
+    return cell;
+  }
 
-    table.getTeams().forEach(t -> {
-      PdfPCell cell = new PdfPCell(new Phrase(t.getName()));
-      cell.setRotation(90);
-      cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-      pdfTable.addCell(cell);
+  private void writeRates(PdfPTable pdfTable) {
+    Map<String, Rate> teamIdToRateMap = new HashMap<>();
+    rates.stream().forEach(rate -> teamIdToRateMap.put(rate.getTeamId(), rate));
+
+    writeSummaryTitle(pdfTable, "Körbe");
+    table.getTeams().forEach(team -> {
+      Rate rate = teamIdToRateMap.get(team.getId());
+      pdfTable.addCell(createCenteredCell(rate.getBothScores()));
+    });
+
+    writeSummaryTitle(pdfTable, "Korbverhältnis");
+    table.getTeams().forEach(team -> {
+      Rate rate = teamIdToRateMap.get(team.getId());
+      pdfTable.addCell(createCenteredCell(String.valueOf(rate.getRate())));
     });
   }
+
+  private void writeSummaryTitle(PdfPTable pdfTable, String summaryTitle) {
+    PdfPCell ratesTitle = new PdfPCell(new Phrase(summaryTitle));
+    ratesTitle.setColspan(2);
+    pdfTable.addCell(ratesTitle);
+  }
+
 
   private void addEmptyLine(Paragraph paragraph, int number) {
     for (int i = 0; i < number; i++) {

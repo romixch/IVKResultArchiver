@@ -30,4 +30,8 @@ public class Table {
   public List<Games> getGames() {
     return games;
   }
+
+  public boolean hasData() {
+    return games != null && teams != null && rounds != null;
+  }
 }

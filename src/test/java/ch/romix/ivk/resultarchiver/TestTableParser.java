@@ -28,7 +28,8 @@ public class TestTableParser {
   public static void beforeClass() {
     Client client = ClientBuilder.newClient();
     parser = new TableParser(client);
-    table = parser.getTable(1);
+    parser.readTableOfGroup(1);
+    table = parser.getTable();
   }
 
   @Test
