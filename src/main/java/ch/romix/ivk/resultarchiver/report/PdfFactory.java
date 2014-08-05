@@ -32,8 +32,9 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 public class PdfFactory {
 
-  private static Font catFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
+  private static Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
   private static Font smallBold = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+  private static Font tableFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
 
   private Group group;
   private Table table;
@@ -86,7 +87,7 @@ public class PdfFactory {
 
   private void addTitle(Document document) throws DocumentException {
     Paragraph preface = new Paragraph();
-    preface.add(new Paragraph("Resultate der Innerschweizer Korbball Meisterschaft", catFont));
+    preface.add(new Paragraph("Resultate der Innerschweizer Korbball Meisterschaft", titleFont));
     addEmptyLine(preface, 1);
     document.add(preface);
   }
@@ -119,14 +120,14 @@ public class PdfFactory {
   }
 
   private void writeHeaderRow(PdfPTable pdfTable) {
-    PdfPCell groupCell = new PdfPCell(new Phrase(group.getName(), smallBold));
+    PdfPCell groupCell = new PdfPCell(new Phrase(group.getName(), titleFont));
     groupCell.setHorizontalAlignment(Element.ALIGN_CENTER);
     groupCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
     groupCell.setColspan(2);
     pdfTable.addCell(groupCell);
 
     table.getTeams().forEach(t -> {
-      PdfPCell cell = new PdfPCell(new Phrase(t.getName()));
+      PdfPCell cell = createCenteredCell(t.getName());
       cell.setRotation(90);
       cell.setVerticalAlignment(Element.ALIGN_MIDDLE);
       pdfTable.addCell(cell);
@@ -136,17 +137,17 @@ public class PdfFactory {
   private void writeResults(PdfPTable pdfTable) {
     table.getTeams().forEach(
         teamOne -> {
-          PdfPCell teamCell = new PdfPCell(new Phrase(teamOne.getName()));
+          PdfPCell teamCell = createTableCell(teamOne.getName());
           teamCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
           teamCell.setRowspan(table.getRounds().size());
           pdfTable.addCell(teamCell);
           table.getRounds().forEach(
               round -> {
-                pdfTable.addCell(round.getName());
+                pdfTable.addCell(createTableCell(round.getName()));
                 table.getTeams().forEach(
                     teamTwo -> {
                       if (teamOne.getId().equals(teamTwo.getId())) {
-                        PdfPCell cell = new PdfPCell(new Phrase(""));
+                        PdfPCell cell = createTableCell("");
                         cell.setBackgroundColor(BaseColor.DARK_GRAY);
                         pdfTable.addCell(cell);
                       } else {
@@ -169,10 +170,14 @@ public class PdfFactory {
         });
   }
 
-  private PdfPCell createCenteredCell(String result) {
-    PdfPCell cell = new PdfPCell(new Phrase(result));
+  private PdfPCell createCenteredCell(String text) {
+    PdfPCell cell = createTableCell(text);
     cell.setHorizontalAlignment(Element.ALIGN_CENTER);
     return cell;
+  }
+
+  private PdfPCell createTableCell(String text) {
+    return new PdfPCell(new Phrase(text, tableFont));
   }
 
   private void writeRates(PdfPTable pdfTable) {
@@ -193,7 +198,7 @@ public class PdfFactory {
   }
 
   private void writeSummaryTitle(PdfPTable pdfTable, String summaryTitle) {
-    PdfPCell ratesTitle = new PdfPCell(new Phrase(summaryTitle));
+    PdfPCell ratesTitle = createTableCell(summaryTitle);
     ratesTitle.setColspan(2);
     pdfTable.addCell(ratesTitle);
   }
