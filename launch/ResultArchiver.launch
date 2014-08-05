@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<launchConfiguration type="org.eclipse.jdt.launching.localJavaApplication">
+<stringAttribute key="bad_container_name" value="l"/>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
+<listEntry value="/IVKResultArchiver/src/main/java/ch/romix/ivk/resultarchiver/Main.java"/>
+</listAttribute>
+<listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
+<listEntry value="1"/>
+</listAttribute>
+<stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ch.romix.ivk.resultarchiver.Main"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="IVKResultArchiver"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DBASE_PATH=&quot;http://localhost/www.turnverband.ch/korbball/ws/&quot;"/>
+</launchConfiguration>
