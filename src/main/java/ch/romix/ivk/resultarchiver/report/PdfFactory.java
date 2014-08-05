@@ -3,7 +3,9 @@ package ch.romix.ivk.resultarchiver.report;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
-import java.util.Date;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -206,7 +208,9 @@ public class PdfFactory {
   private void addFooter(Document document) throws DocumentException {
     Paragraph footer = new Paragraph();
     addEmptyLine(footer, 1);
-    footer.add(new Paragraph("Generiert am " + new Date(), smallBold));
+    DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+    String now = LocalDateTime.now().format(formatter);
+    footer.add(new Paragraph("Generiert am " + now, smallBold));
     document.add(footer);
   }
 }
