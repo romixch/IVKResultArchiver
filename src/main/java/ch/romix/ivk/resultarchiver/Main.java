@@ -6,9 +6,6 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 
 import ch.romix.ivk.resultarchiver.model.Group;
-import ch.romix.ivk.resultarchiver.model.Points;
-import ch.romix.ivk.resultarchiver.model.Rate;
-import ch.romix.ivk.resultarchiver.model.Table;
 import ch.romix.ivk.resultarchiver.report.PdfFactory;
 
 public class Main {
@@ -17,18 +14,19 @@ public class Main {
     Client client = ClientBuilder.newClient();
     List<Group> groups = new GroupParser(client).getGroups();
     groups.forEach(group -> {
-      TableParser table = new TableParser(client);
-      table.readTableOfGroup(group.getID());
-      print(group, table.getTable(), table.getRates(), table.getPoints());
+      TableParser parser = new TableParser(client);
+      parser.readTableOfGroup(group.getID());
+      print(group, parser);
     });
   }
 
-  private static void print(Group group, Table table, List<Rate> rates, List<Points> points) {
+  private static void print(Group group, TableParser parser) {
     PdfFactory pdfFactory = new PdfFactory();
     pdfFactory.setGroup(group);
-    pdfFactory.setTable(table);
-    pdfFactory.setRates(rates);
-    pdfFactory.setPoints(points);
+    pdfFactory.setTable(parser.getTable());
+    pdfFactory.setRates(parser.getRates());
+    pdfFactory.setPoints(parser.getPoints());
+    pdfFactory.setRankings(parser.getRankings());
     pdfFactory.print();
   }
 }

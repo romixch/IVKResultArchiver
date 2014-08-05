@@ -9,6 +9,7 @@ import javax.ws.rs.core.Response;
 
 import ch.romix.ivk.resultarchiver.model.ComposedModel;
 import ch.romix.ivk.resultarchiver.model.Points;
+import ch.romix.ivk.resultarchiver.model.Ranking;
 import ch.romix.ivk.resultarchiver.model.Rate;
 import ch.romix.ivk.resultarchiver.model.Table;
 
@@ -41,5 +42,9 @@ public class TableParser {
 
   public List<Points> getPoints() {
     return model.getPoints();
+  }
+
+  public List<Ranking> getRankings() {
+    return model.getRankings();
   }
 }

@@ -12,6 +12,7 @@ public class ComposedModel {
   private Table table;
   private List<Rate> rates;
   private List<Points> points;
+  private List<Ranking> rankings;
 
   public Table getTable() {
     return table;
@@ -23,5 +24,9 @@ public class ComposedModel {
 
   public List<Points> getPoints() {
     return points;
+  }
+
+  public List<Ranking> getRankings() {
+    return rankings;
   }
 }

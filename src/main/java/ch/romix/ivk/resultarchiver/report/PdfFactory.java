@@ -13,6 +13,7 @@ import java.util.Map;
 import ch.romix.ivk.resultarchiver.model.Games;
 import ch.romix.ivk.resultarchiver.model.Group;
 import ch.romix.ivk.resultarchiver.model.Points;
+import ch.romix.ivk.resultarchiver.model.Ranking;
 import ch.romix.ivk.resultarchiver.model.Rate;
 import ch.romix.ivk.resultarchiver.model.Table;
 import ch.romix.ivk.resultarchiver.model.TeamOne;
@@ -43,6 +44,7 @@ public class PdfFactory {
   private PdfPTable pdfTable;
   private Document document;
   private List<Points> points;
+  private List<Ranking> rankings;
 
   public void setTable(Table table) {
     this.table = table;
@@ -58,7 +60,10 @@ public class PdfFactory {
 
   public void setPoints(List<Points> points) {
     this.points = points;
+  }
 
+  public void setRankings(List<Ranking> rankings) {
+    this.rankings = rankings;
   }
 
   public void print() {
@@ -119,6 +124,8 @@ public class PdfFactory {
     writeRates();
 
     writePoints();
+
+    writeRankings();
 
     document.add(pdfTable);
   }
@@ -216,6 +223,19 @@ public class PdfFactory {
     table.getTeams().forEach(team -> {
       Integer pts = teamIdToPointsMap.get(team.getId());
       pdfTable.addCell(createCenteredCell(String.valueOf(pts)));
+    });
+  }
+
+  private void writeRankings() {
+    Map<String, Integer> teamIdToRankingMap = new HashMap<>();
+    rankings.stream().forEach(ranking -> {
+      ranking.getTeamIds().forEach(teamId -> teamIdToRankingMap.put(teamId, ranking.getRank()));
+    });
+
+    writeSummaryTitle("Rang");
+    table.getTeams().forEach(team -> {
+      Integer rank = teamIdToRankingMap.get(team.getId());
+      pdfTable.addCell(createCenteredCell(String.valueOf(rank)));
     });
   }
 
