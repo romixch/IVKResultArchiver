@@ -58,7 +58,7 @@ public class TestTableParser {
     assertNotNull(teams);
     assertTrue(0 < teams.size());
     for (Team t : teams) {
-      assertTrue(t.getId() > 0);
+      assertTrue(t.getId().length() > 0);
       assertNotNull(t.getName());
     }
   }
@@ -87,7 +87,7 @@ public class TestTableParser {
       assertEquals("There must be the same amount of TeamOnes as teams.", table.getTeams().size(),
           teamOnes.size());
       for (TeamOne t : teamOnes) {
-        assertTrue(t.getTeamOneId() > 0);
+        assertTrue(t.getTeamOneId().length() > 0);
       }
     }
   }
@@ -99,7 +99,7 @@ public class TestTableParser {
         List<TeamTwo> teamTwos = ones.getTeamTwos();
         assertEquals(g.getTeamOnes().size(), teamTwos.size() + 1);
         for (TeamTwo two : teamTwos) {
-          assertTrue(two.getTeamTwoId() > 0);
+          assertTrue(two.getTeamTwoId().length() > 0);
           assertNotNull(two.getResult());
         }
       }

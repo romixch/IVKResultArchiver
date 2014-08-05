@@ -10,10 +10,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TeamOne {
 
-  private int teamOneId;
+  private String teamOneId;
   private List<TeamTwo> teamTwos;
 
-  public int getTeamOneId() {
+  public String getTeamOneId() {
     return teamOneId;
   }
 

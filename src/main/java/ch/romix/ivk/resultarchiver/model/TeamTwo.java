@@ -8,10 +8,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlAccessorType(XmlAccessType.FIELD)
 public class TeamTwo {
 
-  private int teamTwoId;
+  private String teamTwoId;
   private String result;
 
-  public int getTeamTwoId() {
+  public String getTeamTwoId() {
     return teamTwoId;
   }
 

@@ -27,9 +27,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 public class PdfFactory {
 
   private static Font catFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
-  private static Font subFont = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
   private static Font smallBold = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
-  private static Font tableFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
 
   private Group group;
   private Table table;
@@ -109,7 +107,7 @@ public class PdfFactory {
                 pdfTable.addCell(round.getName());
                 table.getTeams().forEach(
                     teamTwo -> {
-                      if (teamOne.getId() == teamTwo.getId()) {
+                      if (teamOne.getId().equals(teamTwo.getId())) {
                         PdfPCell cell = new PdfPCell(new Phrase(""));
                         cell.setBackgroundColor(BaseColor.DARK_GRAY);
                         pdfTable.addCell(cell);
@@ -119,10 +117,12 @@ public class PdfFactory {
                                 .findAny().get();
                         TeamOne one =
                             games.getTeamOnes().stream()
-                                .filter(o -> o.getTeamOneId() == teamOne.getId()).findAny().get();
+                                .filter(o -> o.getTeamOneId().equals(teamOne.getId())).findAny()
+                                .get();
                         TeamTwo two =
                             one.getTeamTwos().stream()
-                                .filter(t -> t.getTeamTwoId() == teamTwo.getId()).findAny().get();
+                                .filter(t -> t.getTeamTwoId().equals(teamTwo.getId())).findAny()
+                                .get();
                         String result = two.getResult();
                         PdfPCell cell = new PdfPCell(new Phrase(result));
                         cell.setHorizontalAlignment(Element.ALIGN_CENTER);
