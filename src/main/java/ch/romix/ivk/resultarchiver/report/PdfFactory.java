@@ -138,6 +138,7 @@ public class PdfFactory {
   }
 
   private void writeHeaderRow() {
+    System.out.println(group.getName());
     PdfPCell groupCell = new PdfPCell(new Phrase(group.getName(), titleFont));
     groupCell.setHorizontalAlignment(Element.ALIGN_CENTER);
     groupCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
@@ -153,39 +154,45 @@ public class PdfFactory {
   }
 
   private void writeResults() {
-    table.getTeams().forEach(
-        teamOne -> {
-          PdfPCell teamCell = createTableCell(teamOne.getName());
-          teamCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
-          teamCell.setRowspan(table.getRounds().size());
-          pdfTable.addCell(teamCell);
-          table.getRounds().forEach(
-              round -> {
-                pdfTable.addCell(createTableCell(round.getName()));
-                table.getTeams().forEach(
-                    teamTwo -> {
-                      if (teamOne.getId().equals(teamTwo.getId())) {
-                        PdfPCell cell = createTableCell("");
-                        cell.setBackgroundColor(BaseColor.DARK_GRAY);
-                        pdfTable.addCell(cell);
-                      } else {
-                        Games games =
-                            table.getGames().stream().filter(g -> g.getRoundId() == round.getId())
-                                .findAny().get();
-                        TeamOne one =
-                            games.getTeamOnes().stream()
-                                .filter(o -> o.getTeamOneId().equals(teamOne.getId())).findAny()
-                                .get();
-                        TeamTwo two =
-                            one.getTeamTwos().stream()
-                                .filter(t -> t.getTeamTwoId().equals(teamTwo.getId())).findAny()
-                                .get();
-                        String result = two.getResult();
-                        pdfTable.addCell(createCenteredCell(result));
-                      }
-                    });
-              });
-        });
+    try {
+
+      table.getTeams().forEach(
+          teamOne -> {
+            PdfPCell teamCell = createTableCell(teamOne.getName());
+            teamCell.setVerticalAlignment(Element.ALIGN_MIDDLE);
+            teamCell.setRowspan(table.getRounds().size());
+            pdfTable.addCell(teamCell);
+            table.getRounds().forEach(
+                round -> {
+                  System.out.println(round.getName());
+                  pdfTable.addCell(createTableCell(round.getName()));
+                  table.getTeams().forEach(
+                      teamTwo -> {
+                        if (teamOne.getId().equals(teamTwo.getId())) {
+                          PdfPCell cell = createTableCell("");
+                          cell.setBackgroundColor(BaseColor.DARK_GRAY);
+                          pdfTable.addCell(cell);
+                        } else {
+                          Games games =
+                              table.getGames().stream()
+                                  .filter(g -> g.getRoundId() == round.getId()).findAny().get();
+                          TeamOne one =
+                              games.getTeamOnes().stream()
+                                  .filter(o -> o.getTeamOneId().equals(teamOne.getId())).findAny()
+                                  .get();
+                          TeamTwo two =
+                              one.getTeamTwos().stream()
+                                  .filter(t -> t.getTeamTwoId().equals(teamTwo.getId())).findAny()
+                                  .get();
+                          String result = two.getResult();
+                          pdfTable.addCell(createCenteredCell(result));
+                        }
+                      });
+                });
+          });
+    } catch (Exception ex) {
+      throw new RuntimeException("Could not write table " + table.getGroupName() + ".", ex);
+    }
   }
 
   private PdfPCell createCenteredCell(String text) {
