@@ -9,5 +9,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ch.romix.ivk.resultarchiver.Main"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="IVKResultArchiver"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DBASE_PATH=&quot;http://localhost/www.turnverband.ch/korbball/ws/&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-DBASE_PATH=&quot;http://localhost/Turnverband/ws/&quot;"/>
 </launchConfiguration>
