@@ -1,21 +1,10 @@
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'com.github.johnrengelman.shadow'
+plugins {
+    id 'java'
+    id 'application'
+}
 
 sourceCompatibility = 1.8
 
-buildscript {
-  repositories { jcenter() }
-  dependencies {
-    classpath 'com.github.jengelman.gradle.plugins:shadow:1.0.2'
-  }
-}
-
-jar {
-    manifest {
-        attributes 'Main-Class': 'ch.romix.ivk.resultarchiver.Main'
-    }
-}
 
 repositories {
     mavenCentral()
@@ -28,3 +17,18 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.+'
 }
+
+mainClassName = 'ch.romix.ivk.resultarchiver.Main'
+
+task configLocal {
+    run { systemProperty "BASE_PATH", "http://localhost/Turnverband/ws/" }
+    print "running against localhost"
+}
+
+task runLocal {
+    group "application"
+}
+
+runLocal.dependsOn(run)
+runLocal.dependsOn(configLocal)
+run.mustRunAfter configLocal
