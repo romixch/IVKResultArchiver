@@ -2,9 +2,11 @@ package ch.romix.ivk.resultarchiver;
 
 public class RESTURI {
 
-  private static final String BASE = "http://korbball.turnverband.ch/ws/";
+  private static final String BASE = "https://korbball.turnverband.ch/ws/";
   private static final String GROUPS = "groupsV1.php";
   private static final String TABLE = "tableV2.php?group=%s";
+  private static final String RANKINGS = "rankingV1.php?group=%s";
+  private static final String GAMES = "gamesV1.php?group=%s";
 
   public static String getGroupURI() {
     return appendToBase(GROUPS);
@@ -12,6 +14,14 @@ public class RESTURI {
 
   public static String getTableURI(int id) {
     return appendToBase(String.format(TABLE, id));
+  }
+
+  public static String getRankingsURI(int id) {
+    return appendToBase(String.format(RANKINGS, id));
+  }
+
+  public static String getGamesURI(int groupId) {
+    return appendToBase(String.format(GAMES, groupId));
   }
 
   private static String appendToBase(String path) {

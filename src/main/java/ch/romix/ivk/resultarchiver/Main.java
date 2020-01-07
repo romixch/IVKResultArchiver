@@ -1,12 +1,10 @@
 package ch.romix.ivk.resultarchiver;
 
+import ch.romix.ivk.resultarchiver.model.Group;
+import ch.romix.ivk.resultarchiver.report.PdfFactoryNew;
 import java.util.List;
-
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
-
-import ch.romix.ivk.resultarchiver.model.Group;
-import ch.romix.ivk.resultarchiver.report.PdfFactory;
 
 public class Main {
 
@@ -14,19 +12,19 @@ public class Main {
     Client client = ClientBuilder.newClient();
     List<Group> groups = new GroupParser(client).getGroups();
     groups.forEach(group -> {
-      TableParser parser = new TableParser(client);
-      parser.readTableOfGroup(group.getID());
-      print(group, parser);
+      TableParser tableParser = new TableParser(client);
+      tableParser.readTableOfGroup(group.getID());
+      RankingParser rankingParser = new RankingParser(client);
+      GamesParser gamesParser = new GamesParser(client);
+      printResults(group, tableParser, rankingParser, gamesParser);
     });
   }
 
-  private static void print(Group group, TableParser parser) {
-    PdfFactory pdfFactory = new PdfFactory();
+  private static void printResults(Group group, TableParser tableParser, RankingParser rankingParser, GamesParser gamesParser) {
+    PdfFactoryNew pdfFactory = new PdfFactoryNew();
     pdfFactory.setGroup(group);
-    pdfFactory.setTable(parser.getTable());
-    pdfFactory.setRates(parser.getRates());
-    pdfFactory.setPoints(parser.getPoints());
-    pdfFactory.setRankings(parser.getRankings());
+    pdfFactory.setRankings(rankingParser.getRankings(group.getID()));
+    pdfFactory.setGames(gamesParser.getGames(group.getID()));
     pdfFactory.print();
   }
 }
