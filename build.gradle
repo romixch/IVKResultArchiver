@@ -32,3 +32,15 @@ task runLocal {
 runLocal.dependsOn(run)
 runLocal.dependsOn(configLocal)
 run.mustRunAfter configLocal
+
+task configTurnverband {
+    run { systemProperty "BASE_PATH", "https://korbball.turnverband.ch/ws/" }
+    print "running against https://korbball.turnverband.ch/ws"
+}
+task runTurnverband {
+    group "application"
+}
+
+runTurnverband.dependsOn(run)
+runTurnverband.dependsOn(configTurnverband)
+run.mustRunAfter configTurnverband
