@@ -29,7 +29,7 @@ public class PdfFactoryNew {
 
   private static Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
   private static Font subtitleFont = new Font(FontFamily.HELVETICA, 16, Font.NORMAL);
-  private static Font smallBold = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
+  private static Font smallBold = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
   private static Font tableFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
 
   private Group group;
@@ -37,6 +37,7 @@ public class PdfFactoryNew {
   private Document document;
   private RankingModel rankings;
   private List<Game> games;
+  private List<String> annotations;
 
   public void setGroup(Group group) {
     this.group = group;
@@ -48,6 +49,10 @@ public class PdfFactoryNew {
 
   public void setGames(List<Game> games) {
     this.games = games;
+  }
+
+  public void setAnnotations(List<String> annotations) {
+    this.annotations = annotations;
   }
 
   public void print() {
@@ -66,6 +71,7 @@ public class PdfFactoryNew {
       addTitle();
       if (rankings.hasData()) {
         addRankingTable();
+        addAnnotations();
         addResultTable();
       } else {
         addNoDataInformation();
@@ -109,9 +115,21 @@ public class PdfFactoryNew {
     document.add(pdfTable);
   }
 
+  private void addAnnotations() throws DocumentException {
+    if (!annotations.isEmpty()) {
+      Paragraph para = new Paragraph();
+      addEmptyLine(para, 1);
+      para.add(new Paragraph("Bemerkungen:", subtitleFont));
+      annotations.forEach(annotation -> {
+        para.add(new Paragraph(annotation, tableFont));
+      });
+      document.add(para);
+    }
+  }
+
   private void addResultTable() throws DocumentException {
     Paragraph title = new Paragraph();
-    addEmptyLine(title, 2);
+    addEmptyLine(title, 1);
     title.add(new Paragraph("Resultate " +group.getName(), subtitleFont));
     addEmptyLine(title, 1);
     document.add(title);
@@ -137,7 +155,7 @@ public class PdfFactoryNew {
   }
   private void addNoDataInformation() throws DocumentException {
     Paragraph noDataParagraph =
-        new Paragraph("Momentan leider keine Daten für diese Gruppe verfügbar.", smallBold);
+        new Paragraph("Momentan leider keine Daten für diese Gruppe verfügbar.", tableFont);
     addEmptyLine(noDataParagraph, 1);
     document.add(noDataParagraph);
   }
