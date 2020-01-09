@@ -1,6 +1,8 @@
 package ch.romix.ivk.resultarchiver.model;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -8,6 +10,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
 public class Game implements Serializable {
+
+  private static SimpleDateFormat dateParser = new SimpleDateFormat("yyyy-MM-dd");
+  private static SimpleDateFormat dateFormatter = new SimpleDateFormat("dd.MM.yyyy");
+  private static SimpleDateFormat timeParser = new SimpleDateFormat("HH:mm:ss");
+  private static SimpleDateFormat timeFormatter = new SimpleDateFormat("HH:mm");
+
 
   private String tag;
   private String zeit;
@@ -59,12 +67,12 @@ public class Game implements Serializable {
     return punkteB;
   }
 
-  public void setTag(String tag) {
-    this.tag = tag;
+  public void setTag(String tag) throws ParseException {
+    this.tag = dateFormatter.format(dateParser.parse(tag));
   }
 
-  public void setZeit(String zeit) {
-    this.zeit = zeit;
+  public void setZeit(String zeit) throws ParseException {
+    this.zeit = timeFormatter.format(timeParser.parse(zeit));
   }
 
   public void setRunde(String runde) {

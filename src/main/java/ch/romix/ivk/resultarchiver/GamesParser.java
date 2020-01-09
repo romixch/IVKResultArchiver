@@ -1,6 +1,7 @@
 package ch.romix.ivk.resultarchiver;
 
 import ch.romix.ivk.resultarchiver.model.Game;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import javax.ws.rs.client.Client;
@@ -38,7 +39,7 @@ public class GamesParser {
         game.setPunkteB(jsonObject.getString("punkteB"));
         games.add(game);
       }
-    } catch (JSONException e) {
+    } catch (JSONException | ParseException e) {
       e.printStackTrace();
     } finally {
       gamesResponse.close();

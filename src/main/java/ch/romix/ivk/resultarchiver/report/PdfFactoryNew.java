@@ -23,6 +23,9 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 
 public class PdfFactoryNew {
@@ -92,12 +95,13 @@ public class PdfFactoryNew {
   }
 
   private void addTitle() throws DocumentException {
-    Paragraph titlePara = new Paragraph();
-    titlePara.add(new Paragraph("Resultate der Innerschweizer Korbball Meisterschaft", titleFont));
-    addEmptyLine(titlePara, 1);
-    titlePara.add(new Paragraph("Rangliste " + group.getName(), subtitleFont));
-    addEmptyLine(titlePara, 1);
+    Paragraph titlePara = new Paragraph("Resultate der Innerschweizer Korbball Meisterschaft",
+        titleFont);
+    titlePara.setSpacingAfter(40);
     document.add(titlePara);
+    Paragraph subtitle = new Paragraph("Rangliste " + group.getName(), subtitleFont);
+    subtitle.setSpacingAfter(20);
+    document.add(subtitle);
   }
 
   private void addRankingTable() throws DocumentException {
@@ -117,46 +121,65 @@ public class PdfFactoryNew {
 
   private void addAnnotations() throws DocumentException {
     if (!annotations.isEmpty()) {
-      Paragraph para = new Paragraph();
-      addEmptyLine(para, 1);
-      para.add(new Paragraph("Bemerkungen:", subtitleFont));
-      annotations.forEach(annotation -> {
-        para.add(new Paragraph(annotation, tableFont));
-      });
-      document.add(para);
+      Paragraph annotationsTitle = new Paragraph("Bemerkungen:", subtitleFont);
+      annotationsTitle.setSpacingAfter(20);
+      document.add(annotationsTitle);
+      for (String annotation: annotations) {
+        Paragraph para = new Paragraph(annotation, tableFont);
+        document.add(para);
+      }
     }
   }
 
   private void addResultTable() throws DocumentException {
-    Paragraph title = new Paragraph();
-    addEmptyLine(title, 1);
-    title.add(new Paragraph("Resultate " +group.getName(), subtitleFont));
-    addEmptyLine(title, 1);
+    Paragraph title = new Paragraph("Resultate " + group.getName(), subtitleFont);
+    title.setSpacingBefore(20);
     document.add(title);
     float[] widths = new float[]{1f, 3f, 3f, 1f};
-    pdfTable = new PdfPTable(widths.length);
-    pdfTable.setWidths(widths);
-    pdfTable.setHorizontalAlignment(Element.ALIGN_LEFT);
 
-    writeResults();
-    formatTable();
+    Map<String, List<Game>> gamesByDay = games.stream().filter(Game::isPlayed)
+        .collect(Collectors.groupingBy(Game::getTag, Collectors.toList()));
 
-    document.add(pdfTable);
+    for (Entry<String, List<Game>> gamesOfOneDay : gamesByDay.entrySet()) {
+      Paragraph dayTitle = new Paragraph(gamesOfOneDay.getKey() + ":");
+      dayTitle.setSpacingBefore(20.0f);
+      dayTitle.setSpacingAfter(10.0f);
+      document.add(dayTitle);
+      pdfTable = new PdfPTable(widths.length);
+      pdfTable.setWidths(widths);
+      pdfTable.setHorizontalAlignment(Element.ALIGN_LEFT);
+
+      for (Game game : gamesOfOneDay.getValue()) {
+        writeResultCell(game.getZeit());
+        writeResultCell(game.getTxtTeamA());
+        writeResultCell(game.getTxtTeamB());
+        writeResultCell(game.getResultatA() + " : " + game.getResultatB());
+        pdfTable.completeRow();
+      }
+
+      formatTable();
+      document.add(pdfTable);
+    }
+
+
   }
 
   private void formatTable() {
     boolean even = false;
     for (PdfPRow row : pdfTable.getRows()) {
       for (PdfPCell cell : row.getCells()) {
-        cell.setBackgroundColor(even ? new BaseColor(245,245,245) : BaseColor.WHITE);
+        if (cell != null) {
+          cell.setBackgroundColor(even ? new BaseColor(245, 245, 245) : BaseColor.WHITE);
+        }
       }
       even = !even;
     }
   }
+
   private void addNoDataInformation() throws DocumentException {
     Paragraph noDataParagraph =
         new Paragraph("Momentan leider keine Daten für diese Gruppe verfügbar.", tableFont);
-    addEmptyLine(noDataParagraph, 1);
+    noDataParagraph.setSpacingAfter(20);
     document.add(noDataParagraph);
   }
 
@@ -217,14 +240,6 @@ public class PdfFactoryNew {
     pdfTable.addCell(cell);
   }
 
-  private void writeResults() {
-    games.stream().filter(Game::isPlayed).forEach(game -> {
-      writeResultCell(game.getZeit());
-      writeResultCell(game.getTxtTeamA());
-      writeResultCell(game.getTxtTeamB());
-      writeResultCell(game.getResultatA() + " : " + game.getResultatB());
-    });
-  }
 
   private void writeResultCell(String text) {
     PdfPCell cell = createTableCell(text);
@@ -241,19 +256,11 @@ public class PdfFactoryNew {
     return cell;
   }
 
-
-  private void addEmptyLine(Paragraph paragraph, int number) {
-    for (int i = 0; i < number; i++) {
-      paragraph.add(new Paragraph(" "));
-    }
-  }
-
   private void addFooter() throws DocumentException {
-    Paragraph footer = new Paragraph();
-    addEmptyLine(footer, 1);
     DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
     String now = LocalDateTime.now().format(formatter);
-    footer.add(new Paragraph("Generiert am " + now, smallBold));
+    Paragraph footer = new Paragraph("Generiert am " + now, smallBold);
+    footer.setSpacingBefore(30);
     document.add(footer);
   }
 
