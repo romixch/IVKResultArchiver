@@ -3,6 +3,7 @@ package ch.romix.ivk.resultarchiver.report;
 import ch.romix.ivk.resultarchiver.model.Game;
 import ch.romix.ivk.resultarchiver.model.Group;
 import ch.romix.ivk.resultarchiver.model.RankingModel;
+import ch.romix.ivk.resultarchiver.model.Season;
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -19,28 +20,35 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.nio.file.Files;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 
-public class PdfFactoryNew {
+public class PdfCreator {
 
   private static Font titleFont = new Font(Font.FontFamily.HELVETICA, 18, Font.BOLD);
   private static Font subtitleFont = new Font(FontFamily.HELVETICA, 16, Font.NORMAL);
   private static Font smallBold = new Font(Font.FontFamily.HELVETICA, 10, Font.BOLD);
   private static Font tableFont = new Font(Font.FontFamily.HELVETICA, 10, Font.NORMAL);
 
+  private Season season;
   private Group group;
   private PdfPTable pdfTable;
   private Document document;
   private RankingModel rankings;
   private List<Game> games;
   private List<String> annotations;
+
+  public void setSeason(Season season) {
+    this.season = season;
+  }
 
   public void setGroup(Group group) {
     this.group = group;
@@ -97,16 +105,20 @@ public class PdfFactoryNew {
   private void addTitle() throws DocumentException {
     Paragraph titlePara = new Paragraph("Resultate der Innerschweizer Korbball Meisterschaft",
         titleFont);
-    titlePara.setSpacingAfter(40);
+    titlePara.setSpacingAfter(10);
     document.add(titlePara);
+    Paragraph seasonPara = new Paragraph("Saison " + season, titleFont);
+    seasonPara.setSpacingAfter(40);
+    document.add(seasonPara);
     Paragraph subtitle = new Paragraph("Rangliste " + group.getName(), subtitleFont);
     subtitle.setSpacingAfter(20);
     document.add(subtitle);
   }
 
   private void addRankingTable() throws DocumentException {
-    float[] widths = new float[]{1f, 3f, 1f, 1f, 1f, 1f, 2f, 1f, 1f};
+    float[] widths = new float[]{0.5f, 3f, 1f, 1f, 1f, 1f, 2f, 1f, 1f};
     pdfTable = new PdfPTable(widths.length);
+    pdfTable.setWidthPercentage(90);
     pdfTable.setWidths(widths);
     pdfTable.setHorizontalAlignment(Element.ALIGN_LEFT);
 
@@ -124,7 +136,7 @@ public class PdfFactoryNew {
       Paragraph annotationsTitle = new Paragraph("Bemerkungen:", subtitleFont);
       annotationsTitle.setSpacingAfter(20);
       document.add(annotationsTitle);
-      for (String annotation: annotations) {
+      for (String annotation : annotations) {
         Paragraph para = new Paragraph(annotation, tableFont);
         document.add(para);
       }
@@ -140,12 +152,22 @@ public class PdfFactoryNew {
     Map<String, List<Game>> gamesByDay = games.stream().filter(Game::isPlayed)
         .collect(Collectors.groupingBy(Game::getTag, Collectors.toList()));
 
-    for (Entry<String, List<Game>> gamesOfOneDay : gamesByDay.entrySet()) {
+    DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    List<Entry<String, List<Game>>> sortedGames = gamesByDay.entrySet().stream().sorted(
+        (a, b) -> {
+          TemporalAccessor timeA = dateTimeFormatter.parse(a.getKey());
+          TemporalAccessor timeB = dateTimeFormatter.parse(b.getKey());
+          return LocalDate.from(timeA).compareTo(LocalDate.from(timeB));
+        }
+    ).collect(Collectors.toList());
+
+    for (Entry<String, List<Game>> gamesOfOneDay : sortedGames) {
       Paragraph dayTitle = new Paragraph(gamesOfOneDay.getKey() + ":");
       dayTitle.setSpacingBefore(20.0f);
       dayTitle.setSpacingAfter(10.0f);
       document.add(dayTitle);
       pdfTable = new PdfPTable(widths.length);
+      pdfTable.setWidthPercentage(90);
       pdfTable.setWidths(widths);
       pdfTable.setHorizontalAlignment(Element.ALIGN_LEFT);
 
@@ -263,6 +285,4 @@ public class PdfFactoryNew {
     footer.setSpacingBefore(30);
     document.add(footer);
   }
-
-
 }

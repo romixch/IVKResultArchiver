@@ -8,6 +8,7 @@ public class RESTURI {
   private static final String RANKINGS = "rankingV1.php?group=%s";
   private static final String GAMES = "gamesV1.php?group=%s";
   private static final String ANNOTATIONS = "annotationsV1.php?group=%s";
+  private static final String SEASON = "seasonV1.php";
 
   public static String getGroupURI() {
     return appendToBase(GROUPS);
@@ -27,6 +28,10 @@ public class RESTURI {
 
   public static String getAnnotationsURI(int groupId) {
     return appendToBase(String.format(ANNOTATIONS, groupId));
+  }
+
+  public static String getSeasonURI() {
+    return appendToBase(SEASON);
   }
 
   private static String appendToBase(String path) {
